@@ -1,4 +1,8 @@
 #include "bpe.h"
+#include <cassert>
+#include <iostream>
+
+using namespace std;
 
 RE2 re(
     "('s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| "
@@ -37,9 +41,14 @@ void test_byte_encode_token() {
   assert("Ġvery" == wstring_to_utf8(b));
 }
 
+string RESOURCES = "tokenizer/assets/";
+
 void test_load_merge_rules() {
   BPERanks bpe_ranks;
-  std::fstream merges("/tmp/merges.txt", std::ios::in);
+  std::fstream merges(RESOURCES+"/merges.txt", std::ios::in);
+  if (! merges.is_open()){
+    cout << "File does not exist" << endl;
+  }
   load_merge_rules(merges, &bpe_ranks);
   assert(bpe_ranks.size() == 50000);
 
@@ -58,7 +67,7 @@ void test_get_pairs() {
 
 void test_bpe() {
   BPERanks bpe_ranks;
-  std::fstream merges("/tmp/merges.txt", std::ios::in);
+  std::fstream merges(RESOURCES + "merges.txt", std::ios::in);
   load_merge_rules(merges, &bpe_ranks);
   assert(bpe_ranks.size() == 50000);
 
@@ -84,7 +93,7 @@ void test_tokenize() {
   assert(re.ok());  // compiled; if not, see re.error();
 
   BPERanks bpe_ranks;
-  std::fstream merges("/tmp/merges.txt", std::ios::in);
+  std::fstream merges(RESOURCES + "merges.txt", std::ios::in);
   load_merge_rules(merges, &bpe_ranks);
 
   std::unordered_map<uint8_t, wchar_t> b2u;
@@ -105,7 +114,7 @@ void test_tokenize_regression() {
   assert(re.ok());  // compiled; if not, see re.error();
 
   BPERanks bpe_ranks;
-  std::fstream merges("/tmp/merges.txt", std::ios::in);
+  std::fstream merges(RESOURCES + "merges.txt", std::ios::in);
   load_merge_rules(merges, &bpe_ranks);
 
   std::unordered_map<uint8_t, wchar_t> b2u;
@@ -119,7 +128,7 @@ void test_tokenize_regression() {
      cat /tmp/lyrics-data.csv | head -n 1000000  | awk 'NF' | sort | \
      uniq | sort -R | head -n 10000 > /tmp/sample.txt
   */
-  std::fstream ins("/tmp/sample.txt", std::ios::in);
+  std::fstream ins(RESOURCES + "sample.txt", std::ios::in);
   std::string line;
   while (std::getline(ins, line)) {
     std::vector<std::string> result;
@@ -131,7 +140,7 @@ void test_tokenize_regression() {
 void test_load_vocab() {
   std::unordered_map<std::string, int> t2i;
   std::unordered_map<int, std::string> i2t;
-  std::fstream vocab_txt("/tmp/vocab.txt", std::ios::in);
+  std::fstream vocab_txt(RESOURCES + "vocab.txt", std::ios::in);
   load_vocab(vocab_txt, &t2i, &i2t);
   assert(t2i.size() == 50257);
   assert(i2t.size() == 50257);
@@ -141,7 +150,7 @@ void test_load_vocab() {
 
 void test_encode_decode() {
   BPERanks bpe_ranks;
-  std::fstream merges("/tmp/merges.txt", std::ios::in);
+  std::fstream merges(RESOURCES + "merges.txt", std::ios::in);
   load_merge_rules(merges, &bpe_ranks);
 
   std::unordered_map<uint8_t, wchar_t> b2u;
@@ -150,7 +159,7 @@ void test_encode_decode() {
 
   std::unordered_map<std::string, int> t2i;
   std::unordered_map<int, std::string> i2t;
-  std::fstream vocab_txt("/tmp/vocab.txt", std::ios::in);
+  std::fstream vocab_txt(RESOURCES + "vocab.txt", std::ios::in);
   load_vocab(vocab_txt, &t2i, &i2t);
 
   std::vector<std::string> candidates = {

@@ -5,6 +5,8 @@
 #include <re2/stringpiece.h>
 
 #include <codecvt>
+#include <locale>
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <set>
