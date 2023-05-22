@@ -29,7 +29,7 @@ void test_tokenize()
   for (auto s : candidates)
   {
     std::vector<std::string> result;
-    tokenizer.tokenize_text(s);
+    result = tokenizer.tokenize_text(s);
     _print_string_vec(result);
   }
 }

@@ -4,3 +4,4 @@ build-*/
 build/
 *xcuserdata*
 __pycache__
+.vscode
